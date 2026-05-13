@@ -1,3 +1,5 @@
+import urllib.request
+import zipfile
 from pathlib import Path
 from datetime import datetime
 from fpdf import FPDF
