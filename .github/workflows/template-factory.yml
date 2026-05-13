@@ -15,12 +15,23 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Cache state.db
-        uses: actions/cache@v4
+      - name: Restore cached state
+        id: cache-restore
+        uses: actions/cache/restore@v4
         with:
           path: state.db
           key: state-db-${{ github.run_id }}
           restore-keys: state-db-
+
+      - name: Debug cache status
+        run: |
+          echo "cache-hit: ${{ steps.cache-restore.outputs.cache-hit }}"
+          if [ -f state.db ]; then
+            echo "state.db exists ($(stat -c%s state.db) bytes)"
+            python -c "import sqlite3; c=sqlite3.connect('state.db'); print('niches:', [r for r in c.execute('SELECT name,last_used_at FROM niches')]); print('templates:', [r for r in c.execute('SELECT title,niche FROM templates')])"
+          else
+            echo "state.db NOT FOUND"
+          fi
 
       - name: Install deps
         run: pip install -r requirements.txt
@@ -32,3 +43,9 @@ jobs:
           PINTEREST_ACCESS_TOKEN: ${{ secrets.PINTEREST_ACCESS_TOKEN }}
           PINTEREST_BOARD_ID: ${{ secrets.PINTEREST_BOARD_ID }}
         run: python main.py
+
+      - name: Save state to cache
+        uses: actions/cache/save@v4
+        with:
+          path: state.db
+          key: state-db-${{ github.run_id }}
