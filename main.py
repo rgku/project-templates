@@ -8,9 +8,10 @@ from marketer import create_pin
 def main():
     config.validate()
     niche = state.get_next_niche()
-    print(f"[{niche}] Generating...")
+    used = state.get_used_titles(niche)
+    print(f"[{niche}] Generating... (avoids {len(used)} previous)")
 
-    data = generate(niche)
+    data = generate(niche, avoid_titles=used)
     prompts_count = sum(len(c["prompts"]) for c in data["prompts"])
     print(f"  Title: {data['title']}")
     print(f"  Prompts: {prompts_count}")

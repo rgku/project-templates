@@ -13,6 +13,9 @@ Rules:
 
 USER_PROMPT_TEMPLATE = """Generate a pack of 50 optimized prompts for DeepSeek V4 Flash in the niche: {niche}.
 
+Already covered titles (AVOID these exact themes/topics):
+{avoid}
+
 Return JSON with this exact structure:
 {{
   "title": "50 DeepSeek Prompts for [Niche]",
@@ -29,7 +32,8 @@ Return JSON with this exact structure:
 }}
 """
 
-def generate(niche: str) -> dict:
+def generate(niche: str, avoid_titles: list[str] | None = None) -> dict:
+    avoid_block = "\n".join(f"- {t}" for t in (avoid_titles or [])) or "(none yet)"
     resp = requests.post(
         url="https://openrouter.ai/api/v1/chat/completions",
         headers={
@@ -40,7 +44,7 @@ def generate(niche: str) -> dict:
             "model": config.deepseek_model,
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": USER_PROMPT_TEMPLATE.format(niche=niche)},
+                {"role": "user", "content": USER_PROMPT_TEMPLATE.format(niche=niche, avoid=avoid_block)},
             ],
             "temperature": 0.7,
             "max_tokens": 8000,

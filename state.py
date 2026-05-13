@@ -59,6 +59,12 @@ class State:
         """, (title, niche, prompts_count, gumroad_id, gumroad_url, pinterest_pin_id, status))
         self.conn.commit()
 
+    def get_used_titles(self, niche: str) -> list[str]:
+        rows = self.conn.execute(
+            "SELECT title FROM templates WHERE niche = ? ORDER BY created_at DESC", (niche,)
+        ).fetchall()
+        return [r[0] for r in rows]
+
     def get_recent_templates(self, limit: int = 5):
         return self.conn.execute(
             "SELECT title, niche, created_at FROM templates ORDER BY created_at DESC LIMIT ?",
