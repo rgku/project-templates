@@ -21,8 +21,12 @@ def main():
     product = publish(data, str(filepath))
     print(f"  Gumroad: {product['url']}")
 
-    pin_id = create_pin(data, product)
-    print(f"  Pinterest Pin: {pin_id}")
+    try:
+        pin_id = create_pin(data, product)
+        print(f"  Pinterest Pin: {pin_id}")
+    except Exception as e:
+        print(f"  Pinterest failed (auth pending): {e}")
+        pin_id = None
 
     state.record_template(
         title=data["title"],

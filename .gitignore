@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+state.db
+templates/*.pdf
+logo.png
+logo.svg
+$null
