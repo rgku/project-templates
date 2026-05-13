@@ -68,6 +68,7 @@ def publish(data: dict, filepath: str) -> dict:
         ("description", data.get("description", "")),
         ("price", str(price_cents)),
         ("files[][url]", file_url),
+        ("published", "true"),
     ]
     for tag in data.get("tags", []):
         product_data.append(("tags[]", tag))
