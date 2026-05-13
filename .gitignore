@@ -5,4 +5,5 @@ state.db
 templates/*.pdf
 logo.png
 logo.svg
+DejaVuSans*.ttf
 $null
