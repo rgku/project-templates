@@ -3,19 +3,23 @@ from datetime import datetime
 from fpdf import FPDF
 from config import config
 
-FONT_URLS = {
-    "DejaVuSans.ttf": "https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSans.ttf",
-    "DejaVuSans-Bold.ttf": "https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSans-Bold.ttf",
-}
 FONT_DIR = Path(__file__).parent
+FONT_ZIP_URL = "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip"
+FONT_ZIP = FONT_DIR / "dejavu-fonts-ttf-2.37.zip"
+ZIP_PREFIX = "dejavu-fonts-ttf-2.37/ttf/"
+NEEDED = {"DejaVuSans.ttf", "DejaVuSans-Bold.ttf"}
 
 def _ensure_fonts():
-    import urllib.request
-    for name, url in FONT_URLS.items():
-        p = FONT_DIR / name
-        if not p.exists():
-            print(f"  Downloading {name}...")
-            urllib.request.urlretrieve(url, p)
+    if all((FONT_DIR / n).exists() for n in NEEDED):
+        return
+    print("  Downloading DejaVuSans fonts...")
+    urllib.request.urlretrieve(FONT_ZIP_URL, FONT_ZIP)
+    with zipfile.ZipFile(FONT_ZIP) as z:
+        for name in NEEDED:
+            src = ZIP_PREFIX + name
+            z.extract(src, FONT_DIR)
+            (FONT_DIR / src).rename(FONT_DIR / name)
+    FONT_ZIP.unlink()
 
 class PromptPackPDF(FPDF):
     def __init__(self):
